@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Destiny2.Config;
 using Destiny2.Responses;
@@ -31,7 +32,7 @@ namespace Destiny2.Services
             get { return _settings.TraceWriter != null; }
             set
             {
-                if(value)
+                if (value)
                 {
                     _settings.TraceWriter = _jsonLogWriter;
                 }
@@ -93,7 +94,7 @@ namespace Destiny2.Services
                     }
                 }
             }
-            catch(HttpRequestException ex)
+            catch (HttpRequestException ex)
             {
                 _logger.LogError($"Error downloading {relativePath}: {ex.Message}");
                 return false;
@@ -116,18 +117,40 @@ namespace Destiny2.Services
 
         private async Task<T> Get<T>(string accessToken, string method, params (string name, string value)[] queryItems)
         {
-            if(!string.IsNullOrEmpty(accessToken))
+            return await Request<T>("GET", accessToken, method, null, queryItems);
+        }
+
+        private async Task<T> Post<T>(string accessToken, string method, object body, params (string name, string value)[] queryItems)
+        {
+            return await Request<T>("POST", accessToken, method, body, queryItems);
+        }
+
+        private async Task<T> Request<T>(string method, string accessToken, string apiMethod, object body, params (string name, string value)[] queryItems)
+        {
+            if (!string.IsNullOrEmpty(accessToken))
             {
                 _client.DefaultRequestHeaders.Remove("Authorization");
                 _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
             }
-        
+
+            Func<HttpClient, string, HttpContent, Task<string>> requestMethod = RequestGet;
+
+            switch (method)
+            {
+                case "POST":
+                    requestMethod = RequestPost;
+                    break;
+                default:
+                    break;
+            }
+
             try
             {
-                var url = BuildUrl(method, queryItems);
+                var url = BuildUrl(apiMethod, queryItems);
                 _logger.LogInformation($"Calling {url}");
 
-                var json = await _client.GetStringAsync(url);
+                var stringContent = body != null ? new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json") : null;
+                var json = await requestMethod(_client, apiMethod, stringContent);
 
                 var response = JsonConvert.DeserializeObject<Response<T>>(json, _settings);
 
@@ -141,9 +164,22 @@ namespace Destiny2.Services
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError($"Error calling {method}: {ex.Message}");
+                _logger.LogError($"Error calling {apiMethod}: {ex.Message}");
                 return default(T);
             }
+        }
+
+        private async Task<string> RequestGet(HttpClient client, string url, HttpContent _) => await client.GetStringAsync(url);
+        private async Task<string> RequestPost(HttpClient client, string url, HttpContent content)
+        {
+            var result = await client.PostAsync(url, content);
+
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException("Response failure");
+            }
+
+            return await result.Content.ReadAsStringAsync();
         }
 
         private static (string name, string value) ConvertComponents(IEnumerable<DestinyComponentType> components)
