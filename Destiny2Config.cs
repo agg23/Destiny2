@@ -1,3 +1,6 @@
+using System;
+using System.Net.Http;
+
 namespace Destiny2
 {
   public class Destiny2Config
@@ -17,6 +20,7 @@ namespace Destiny2
     public string ManifestDatabasePath { get; set; } = "";
     public int ManifestCheckTimeout { get; set; } = 5 * 60 * 1000;
     public string UserAgent { get; }
+    public Func<HttpClientHandler> CustomClientHandlerFunc { get; set; }
 
     public bool IsValid => !string.IsNullOrEmpty(BaseUrl) &&
       !string.IsNullOrEmpty(ApiKey) &&

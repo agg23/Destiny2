@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using Destiny2;
 using Destiny2.Helpers;
 using Destiny2.Services;
@@ -18,14 +19,14 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddTransient<ITraceWriter, JsonLogWriter>();
 
-            AddDestiny2Service(services, config.BaseUrl, config.ApiKey, config.UserAgent);
+            AddDestiny2Service(services, config.BaseUrl, config.ApiKey, config.UserAgent, config.CustomClientHandlerFunc);
             AddManifestDownloader(services);
             AddManifestSettings(services, config.ManifestDatabasePath, config.ManifestCheckTimeout);
             AddManifestHostedService(services);
             AddManifest(services);
         }
 
-        private static void AddDestiny2Service(IServiceCollection services, string baseUrl, string apiKey, string userAgent)
+        private static void AddDestiny2Service(IServiceCollection services, string baseUrl, string apiKey, string userAgent, Func<HttpClientHandler> clientHandlerFunc)
         {
             if(string.IsNullOrEmpty(baseUrl))
             {
@@ -36,7 +37,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentException("Must specify an API Key", nameof(apiKey));
             }
 
-            services.AddHttpClient<IDestiny2, Destiny2.Services.Destiny2>(client =>
+            var factory = services.AddHttpClient<IDestiny2, Destiny2.Services.Destiny2>(client =>
             {
                 client.BaseAddress = new Uri(baseUrl);
                 client.DefaultRequestHeaders.Add("X-API-Key", apiKey);
@@ -46,6 +47,11 @@ namespace Microsoft.Extensions.DependencyInjection
                     NoCache = true
                 };
             });
+
+            if (clientHandlerFunc != null)
+            {
+                factory.ConfigurePrimaryHttpMessageHandler(clientHandlerFunc);
+            }
         }
 
         private static void AddManifestDownloader(IServiceCollection services)

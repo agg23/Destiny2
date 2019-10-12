@@ -139,7 +139,6 @@ namespace Destiny2.Services
 
         private async Task<T> Get<T>(string accessToken, string method, params (string name, string value)[] queryItems)
         {
-            System.Diagnostics.Debug.WriteLine(method);
             return await Request<T>("GET", accessToken, method, null, queryItems);
         }
 
