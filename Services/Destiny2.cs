@@ -81,7 +81,7 @@ namespace Destiny2.Services
             return Get<DestinyItemResponse>(accessToken, $"Destiny2/{(int)type}/Profile/{id}/Item/{itemInstanceId}/", query);
         }
 
-        public Task EquipItem(string accessToken, BungieMembershipType type, long characterId, long itemInstanceId)
+        public Task<int> EquipItem(string accessToken, BungieMembershipType type, long characterId, long itemInstanceId)
         {
             dynamic body = new
             {
@@ -89,7 +89,18 @@ namespace Destiny2.Services
                 characterId,
                 membershipType = type,
             };
-            return Post<object>(accessToken, $"/Destiny2/Actions/Items/EquipItem/", body);
+            return Post<int>(accessToken, $"/Destiny2/Actions/Items/EquipItem/", body);
+        }
+
+        public Task<DestinyEquipItemResponse> EquipItems(string accessToken, BungieMembershipType type, long characterId, long[] itemInstanceIds)
+        {
+            dynamic body = new
+            {
+                itemIds = itemInstanceIds,
+                characterId,
+                membershipType = type,
+            };
+            return Post<DestinyEquipItemResponse>(accessToken, $"/Destiny2/Actions/Items/EquipItems/", body);
         }
 
         public async Task<bool> DownloadFile(string relativePath, string destination)

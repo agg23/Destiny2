@@ -18,7 +18,8 @@ namespace Destiny2
             params DestinyComponentType[] infos);
         Task<bool> DownloadFile(string relativePath, string destination);
 
-        Task EquipItem(string accessToken, BungieMembershipType type, long characterId, long itemInstanceId);
+        Task<int> EquipItem(string accessToken, BungieMembershipType type, long characterId, long itemInstanceId);
+        Task<DestinyEquipItemResponse> EquipItems(string accessToken, BungieMembershipType type, long characterId, long[] itemInstanceIds);
 
         string BaseUrl { get; }
         bool DeserializationDebugging { get; set; }
