@@ -6,9 +6,9 @@ namespace Destiny2
 {
     public interface IDestiny2
     {
-         Task<Manifest> GetManifest();
-         Task<DestinyLinkedProfilesResponse> GetLinkedProfiles(string accessToken, long membershipId,
-             BungieMembershipType type = BungieMembershipType.BungieNext);
+        Task<Manifest> GetManifest();
+        Task<DestinyLinkedProfilesResponse> GetLinkedProfiles(string accessToken, long membershipId,
+            BungieMembershipType type = BungieMembershipType.BungieNext);
         Task<DestinyProfileResponse> GetProfile(string accessToken, BungieMembershipType type, long id);
         Task<DestinyProfileResponse> GetProfile(string accessToken, BungieMembershipType type, long id,
             params DestinyComponentType[] components);
@@ -17,6 +17,8 @@ namespace Destiny2
         Task<DestinyItemResponse> GetItem(string accessToken, BungieMembershipType type, long id, long itemInstanceId,
             params DestinyComponentType[] infos);
         Task<bool> DownloadFile(string relativePath, string destination);
+
+        Task EquipItem(string accessToken, BungieMembershipType type, long characterId, long itemInstanceId);
 
         string BaseUrl { get; }
         bool DeserializationDebugging { get; set; }

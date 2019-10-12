@@ -81,6 +81,17 @@ namespace Destiny2.Services
             return Get<DestinyItemResponse>(accessToken, $"Destiny2/{(int)type}/Profile/{id}/Item/{itemInstanceId}/", query);
         }
 
+        public Task EquipItem(string accessToken, BungieMembershipType type, long characterId, long itemInstanceId)
+        {
+            dynamic body = new
+            {
+                itemId = itemInstanceId,
+                characterId,
+                membershipType = type,
+            };
+            return Post<object>(accessToken, $"/Destiny2/Actions/Items/EquipItem/", body);
+        }
+
         public async Task<bool> DownloadFile(string relativePath, string destination)
         {
             try
@@ -117,6 +128,7 @@ namespace Destiny2.Services
 
         private async Task<T> Get<T>(string accessToken, string method, params (string name, string value)[] queryItems)
         {
+            System.Diagnostics.Debug.WriteLine(method);
             return await Request<T>("GET", accessToken, method, null, queryItems);
         }
 
@@ -133,7 +145,7 @@ namespace Destiny2.Services
                 _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
             }
 
-            Func<HttpClient, string, HttpContent, Task<string>> requestMethod = RequestGet;
+            Func<HttpClient, Uri, HttpContent, Task<string>> requestMethod = RequestGet;
 
             switch (method)
             {
@@ -150,7 +162,7 @@ namespace Destiny2.Services
                 _logger.LogInformation($"Calling {url}");
 
                 var stringContent = body != null ? new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json") : null;
-                var json = await requestMethod(_client, apiMethod, stringContent);
+                var json = await requestMethod(_client, url, stringContent);
 
                 var response = JsonConvert.DeserializeObject<Response<T>>(json, _settings);
 
@@ -169,8 +181,8 @@ namespace Destiny2.Services
             }
         }
 
-        private async Task<string> RequestGet(HttpClient client, string url, HttpContent _) => await client.GetStringAsync(url);
-        private async Task<string> RequestPost(HttpClient client, string url, HttpContent content)
+        private async Task<string> RequestGet(HttpClient client, Uri url, HttpContent _) => await client.GetStringAsync(url);
+        private async Task<string> RequestPost(HttpClient client, Uri url, HttpContent content)
         {
             var result = await client.PostAsync(url, content);
 

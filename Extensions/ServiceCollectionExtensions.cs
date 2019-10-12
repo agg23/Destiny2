@@ -41,6 +41,10 @@ namespace Microsoft.Extensions.DependencyInjection
                 client.BaseAddress = new Uri(baseUrl);
                 client.DefaultRequestHeaders.Add("X-API-Key", apiKey);
                 client.DefaultRequestHeaders.Add("User-Agent", userAgent);
+                client.DefaultRequestHeaders.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
+                {
+                    NoCache = true
+                };
             });
         }
 

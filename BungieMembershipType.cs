@@ -10,6 +10,8 @@ namespace Destiny2
         TigerXbox = 1,
         [Description("PSN")]
         TigerPsn = 2,
+        [Description("Steam")]
+        TigerSteam = 3,
         [Description("Battle.NET")]
         TigerBlizzard = 4,
         [Description("Demon")]
