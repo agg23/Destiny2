@@ -20,6 +20,7 @@ namespace Destiny2
 
         Task<int> EquipItem(string accessToken, BungieMembershipType type, long characterId, long itemInstanceId);
         Task<DestinyEquipItemResponse> EquipItems(string accessToken, BungieMembershipType type, long characterId, long[] itemInstanceIds);
+        Task<int> TransferItem(string accessToken, BungieMembershipType type, long characterId, long itemInstanceId, bool transferToVault);
 
         string BaseUrl { get; }
         bool DeserializationDebugging { get; set; }

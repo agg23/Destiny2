@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -103,6 +104,18 @@ namespace Destiny2.Services
             return Post<DestinyEquipItemResponse>(accessToken, $"/Destiny2/Actions/Items/EquipItems/", body);
         }
 
+        public Task<int> TransferItem(string accessToken, BungieMembershipType type, long characterId, long itemInstanceId, bool transferToVault)
+        {
+            dynamic body = new
+            {
+                transferToVault,
+                itemId = itemInstanceId,
+                characterId,
+                membershipType = type,
+            };
+            return Post<int>(accessToken, $"/Destiny2/Actions/Items/TransferItem", body);
+        }
+
         public async Task<bool> DownloadFile(string relativePath, string destination)
         {
             try
@@ -155,7 +168,7 @@ namespace Destiny2.Services
                 _client.DefaultRequestHeaders.Add("Authorization", $"Bearer {accessToken}");
             }
 
-            Func<HttpClient, Uri, HttpContent, Task<string>> requestMethod = RequestGet;
+            Func<HttpClient, Uri, HttpContent, Task<HttpResponseMessage>> requestMethod = RequestGet;
 
             switch (method)
             {
@@ -172,7 +185,14 @@ namespace Destiny2.Services
                 _logger.LogInformation($"Calling {url}");
 
                 var stringContent = body != null ? new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json") : null;
-                var json = await requestMethod(_client, url, stringContent);
+                var result = await requestMethod(_client, url, stringContent);
+
+                if (result.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    throw new UnauthorizedAccessException();
+                }
+
+                var json = await result.Content.ReadAsStringAsync();
 
                 var response = JsonConvert.DeserializeObject<Response<T>>(json, _settings);
 
@@ -191,18 +211,8 @@ namespace Destiny2.Services
             }
         }
 
-        private async Task<string> RequestGet(HttpClient client, Uri url, HttpContent _) => await client.GetStringAsync(url);
-        private async Task<string> RequestPost(HttpClient client, Uri url, HttpContent content)
-        {
-            var result = await client.PostAsync(url, content);
-
-            if (!result.IsSuccessStatusCode)
-            {
-                throw new HttpRequestException("Response failure");
-            }
-
-            return await result.Content.ReadAsStringAsync();
-        }
+        private async Task<HttpResponseMessage> RequestGet(HttpClient client, Uri url, HttpContent _) => await client.GetAsync(url);
+        private async Task<HttpResponseMessage> RequestPost(HttpClient client, Uri url, HttpContent content) => await client.PostAsync(url, content);
 
         private static (string name, string value) ConvertComponents(IEnumerable<DestinyComponentType> components)
         {

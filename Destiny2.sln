@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29409.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Destiny2", "Destiny2.csproj", "{66F5D184-54B3-47E4-A5F5-CE73E7293CF2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Destiny2.Authorization", "Destiny2.Authorization\Destiny2.Authorization.csproj", "{10897253-462B-4FDC-BE61-02FD3232C8E6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{66F5D184-54B3-47E4-A5F5-CE73E7293CF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66F5D184-54B3-47E4-A5F5-CE73E7293CF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66F5D184-54B3-47E4-A5F5-CE73E7293CF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66F5D184-54B3-47E4-A5F5-CE73E7293CF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10897253-462B-4FDC-BE61-02FD3232C8E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10897253-462B-4FDC-BE61-02FD3232C8E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10897253-462B-4FDC-BE61-02FD3232C8E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10897253-462B-4FDC-BE61-02FD3232C8E6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E56A5EC4-0B3A-4FA8-886F-C87F430BF6EC}
+	EndGlobalSection
+EndGlobal

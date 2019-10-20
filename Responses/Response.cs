@@ -13,5 +13,10 @@ namespace Destiny2.Responses
         public string Message { get; set; }
         public IDictionary<string, string> MessageData { get; set; }
         public string DetailedErrorTrace { get; set; }
+
+        /// <summary>
+        /// HTTP Status Code
+        /// </summary>
+        public int StatusCode { get; set; }
     }
 }
